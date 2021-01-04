@@ -5,25 +5,34 @@ const request = require('supertest');
 const expect = require('chai').expect;
 
 //const host = 'http://47.108.167.42:10080/memory';
-const host = 'http://127.0.0.1:10080/memory';
+const host = 'http://127.0.0.1:10081/memory';
 const req = request(host);
 const page = '?page=0&size=20';
 
-describe('Array', function() {
-  describe('#indexOf()', function() {
-    it('should return -1 when the value is not present', function() {
-      assert.equal([1, 2, 3].indexOf(4), -1);
-    });
-  });
-});
-
 let hallId;
+let token;
 
 describe('funeral hall tests', function() {
+
+  before(function(done) {
+
+    req.get("/testSecurity")
+       .end(function(err, res) {
+          if(err) done(err);
+          token = res.body.data;
+          console.log('token is: ' + token);
+          done();
+       });
+
+  });
+
   const path = '/funeralHalls';
-  it("should get hall list", function() {
-    req.get(path + page).expect(200, function(err) {
-      console.log("error is", err);
+  it("should get hall list", function(done) {
+    req.get(path + page)
+       .set('Authorization', token)
+       .expect(200, function(err) {
+         if(err) done(err);
+         done();
     });
   });
 
@@ -47,6 +56,7 @@ describe('funeral hall tests', function() {
     req.post(path)
        .send(data)
        .set('Content-Type', 'application/json')
+       .set('Authorization', token)
        .expect('Content-Type', /json/)
        .expect(200)
        .end(function(err, res) {
@@ -59,6 +69,7 @@ describe('funeral hall tests', function() {
 
   it('should get hall details', function(done) {
     req.get(path + '/' + hallId)
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end((err, res) => {
@@ -70,6 +81,7 @@ describe('funeral hall tests', function() {
 
   it('should query halls', function(done){
     req.get(path + '/' + 'query'  + page + '&text=')
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res) {
@@ -82,6 +94,7 @@ describe('funeral hall tests', function() {
 
   it('should get all halls', function(done){
     req.get(path + page)
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res){
@@ -96,6 +109,7 @@ describe('funeral hall tests', function() {
     const bodyString = `{"type":"FLOWER","count":10, "message": "很遗憾没有见上最后一面"}`;
     const reqBody = JSON.parse(bodyString);
     req.post(path + '/' + hallId + "/gifts")
+       .set('Authorization', token)
        .set('Content-Type', 'application/json')
        .send(reqBody)
        .expect(200)
@@ -109,6 +123,7 @@ describe('funeral hall tests', function() {
   it('should get hall gifts list', function(done){
     req.get(path + '/' + hallId + '/gifts?page=0&size=10')
        .set('Content-Type', 'application/json')
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res) {
@@ -120,6 +135,7 @@ describe('funeral hall tests', function() {
 
   it('should get hall events', function(done){
     req.get(path + '/' + hallId + '/events?page=0&size=10')
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res){
@@ -137,6 +153,7 @@ describe('funeral hall tests', function() {
     }`);
     reqBody.entityId = hallId;
     req.post('/comments')
+       .set('Authorization', token)
        .set('Content-Type', 'application/json')
        .send(reqBody)
        .expect(200)
@@ -149,6 +166,7 @@ describe('funeral hall tests', function() {
 
   it('should get funeral comments', function(done){
     req.get('/comments?page=0&size=10&entityId=' + hallId + '&entityType=FUNERAL_HALL')
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res){
@@ -168,6 +186,7 @@ describe('funeral hall tests', function() {
     `);
     reqBody.entityId = hallId;
     req.post('/activities')
+       .set('Authorization', token)
        .set('Content-Type', 'application/json')
        .send(reqBody)
        .expect(200)
@@ -182,6 +201,7 @@ describe('funeral hall tests', function() {
 describe('gift tests', function(){
   it('should get default gift list', function(done){
     req.get('/gifts?page=0&size=10')
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res) {
@@ -195,6 +215,7 @@ describe('gift tests', function(){
 describe('user relateds tests', function() {
   it('should get user quota for one funeral', function(done){
     req.get('/user/quota?hallId=' + hallId)
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res){
@@ -207,6 +228,7 @@ describe('user relateds tests', function() {
 
   it('should get user halls', function(done){
     req.get('/user/funeralHalls')
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res){
@@ -218,6 +240,7 @@ describe('user relateds tests', function() {
 
   it('should get user activities', function(done){
     req.get('/activities/user?page=0&size=20')
+       .set('Authorization', token)
        .send()
        .expect(200)
        .end(function(err, res){
