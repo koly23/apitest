@@ -4,7 +4,8 @@ const request = require('supertest');
 //const should = require('chai').should(); 
 const expect = require('chai').expect;
 
-//const host = 'http://47.108.167.42:10080/memory';
+//const host = 'http://47.108.167.42:10081/memory';
+//const host = 'https://www.fzwuxing.com:10082/memory';
 const host = 'http://127.0.0.1:10081/memory';
 const req = request(host);
 const page = '?page=0&size=20';
@@ -87,7 +88,7 @@ describe('funeral hall tests', function() {
        .end(function(err, res) {
          if (err) done(err);
          expect(res.body.data.items).be.a('array')
-         expect(res.body.data.items).have.lengthOf.above(1)
+         expect(res.body.data.items).have.lengthOf.at.least(1)
          done()
        });
   });
@@ -100,7 +101,7 @@ describe('funeral hall tests', function() {
        .end(function(err, res){
          if(err) done(err);
          expect(res.body.data.items).be.a('array')
-         expect(res.body.data.items).have.lengthOf.above(1)
+         expect(res.body.data.items).have.lengthOf.at.least(1)
          done();
        });
   });
