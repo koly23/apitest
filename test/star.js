@@ -9,6 +9,7 @@ const expect = require('chai').expect;
 const host = 'http://127.0.0.1:10081/memory';
 const req = request(host);
 const page = '?page=0&size=20';
+const tokenHeader = 'Authorization';
 
 let hallId;
 let token;
@@ -37,6 +38,17 @@ describe('funeral hall tests', function() {
     });
   });
 
+  it("should get all background images",function(done) {
+    req.get('/backgroundPics' + page)
+       .set(tokenHeader, token)
+       .expect(200, function(err, res){
+          if(err) done(err);
+          expect(res.body.data.items).be.a('array')
+          expect(res.body.data.items).have.lengthOf.at.least(1)
+          done();
+       });
+  });
+
   it("should create hall", function(done) {
     const test = `{
       "name":"屈原",
@@ -47,6 +59,8 @@ describe('funeral hall tests', function() {
       "picBucket":"funerals",
       "picName":"2ff85fb3db534c0ab5ddb27922ee0431-002.jpeg",
       "backgroundPicId": 111,
+      "wanlianPicId": 112,
+      "customWanlian": 1,
       "hengpi":"千古流芳",
       "shanglian":"海内存知己",
       "xialian":"云间涉德音",
