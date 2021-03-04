@@ -59,11 +59,54 @@ describe('funeral hall tests', function() {
       "picBucket":"funerals",
       "picName":"2ff85fb3db534c0ab5ddb27922ee0431-002.jpeg",
       "backgroundPicId": 111,
+      "backgroundMusicId": 111,
       "wanlianPicId": 112,
       "customWanlian": 1,
       "hengpi":"千古流芳",
       "shanglian":"海内存知己",
       "xialian":"云间涉德音",
+      "memoMeetingTime": "2020-12-30 18:00:00",
+      "memoMeetingAddress": "四川省成都市高新区666号",
+      "announcement": "阿雷西博射电望远镜因抢救无效，于北京时间公元2020年12月1日晚离世，享年57岁。阿雷西博望远镜生于1963年，一生任劳任怨，居功至伟，成就非凡，奇功盖世。不幸于2020年11月6日突发馈源舱主钢缆断裂而陷入昏迷，经工程人员紧急会诊后仍无良药医治。12月1日馈源舱坠落主反射面，阿雷西博望远镜走完了其光辉灿烂的一生。阿雷西博同志永垂不朽！"
+    }`
+    const data = JSON.parse(test);
+    req.post(path)
+       .send(data)
+       .set('Content-Type', 'application/json')
+       .set('Authorization', token)
+       .expect('Content-Type', /json/)
+       .expect(200)
+       .end(function(err, res) {
+        if (err) return done(err);
+        expect(res.body.data).exist
+        hallId = res.body.data;
+        done();
+       });
+  });
+
+ it("should create hall with deceased images and videos", function(done) {
+    const test = `{
+      "name":"屈原",
+      "birthday":"0190-02-09 18:00:00",
+      "passDate":"0230-07-08 00:00:00",
+      "gender":"MALE",
+      "lifeDescription":"屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人屈原是一个伟大的任务，他是一个可歌可泣的人",
+      "picBucket":"funerals",
+      "picName":"2ff85fb3db534c0ab5ddb27922ee0431-002.jpeg",
+      "backgroundPicId": 111,
+      "backgroundMusicId": 111,
+      "wanlianPicId": 112,
+      "customWanlian": 1,
+      "hengpi":"千古流芳",
+      "shanglian":"海内存知己",
+      "xialian":"云间涉德音",
+      "deceasedImages": [
+        "lsjflsjdfj",
+        "jslfjldjflsdjf"
+        ],
+      "deceasedVideos": [
+        "jksdfkjlsjfsdoAKJFLDK"
+        ],
       "memoMeetingTime": "2020-12-30 18:00:00",
       "memoMeetingAddress": "四川省成都市高新区666号",
       "announcement": "阿雷西博射电望远镜因抢救无效，于北京时间公元2020年12月1日晚离世，享年57岁。阿雷西博望远镜生于1963年，一生任劳任怨，居功至伟，成就非凡，奇功盖世。不幸于2020年11月6日突发馈源舱主钢缆断裂而陷入昏迷，经工程人员紧急会诊后仍无良药医治。12月1日馈源舱坠落主反射面，阿雷西博望远镜走完了其光辉灿烂的一生。阿雷西博同志永垂不朽！"
@@ -92,6 +135,19 @@ describe('funeral hall tests', function() {
          if(err) done(err);
          expect(res.body.data.idStr).equal(hallId);
          done();
+       });
+  });
+
+  it('should get hall deceased images and videos', function(done){
+    req.get('/deceasedMedias?hallId=' + hallId + '&page=0&size=20')
+       .set('Authorization', token)
+       .send()
+       .expect(200)
+       .end(function(err, res){
+          if(err) done(err);
+          expect(res.body.data.items).be.a('array')
+          expect(res.body.data.items).have.lengthOf.at.least(1)
+          done()
        });
   });
 
